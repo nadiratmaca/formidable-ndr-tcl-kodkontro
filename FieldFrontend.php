@@ -1,9 +1,5 @@
 <?php
-
-
 defined('ABSPATH') or die('Bu dosya doğrudan çağırılarak çalışmaz.');
-
-
 
 add_filter('frm_validate_field_entry', 'ndr_formidable_tcl_kod_validator', 10, 3);
 function ndr_formidable_tcl_kod_validator($errors, $field, $value)
@@ -20,27 +16,45 @@ function ndr_formidable_tcl_kod_validator($errors, $field, $value)
         echo $field->field_options['fld_kod'];
         /********** */
 
-        $fld_kod = trim($_POST['item_meta'][$field->field_options['fld_kod']]);
-<<<<<<< Updated upstream
-=======
-       
-        //var_dump(ndr_formidable_tcl_servis_sorgula($fld_kod));
+        $kod = trim($_POST['item_meta'][$field->field_options['fld_kod']]);
+
+        $errorMesage = $field->field_options['error_kodkontrol'];
+
+        if (ndr_tcl_kod_pre_valid($kod) == false) {
+
+            $errors['field' . $field->id] = "Hatalı KOD! Lütfen SMS ile gelen kodu doğru girdiğinizi kontrol ediniz. ";;
+
+            } else {
 
 
-        if (ndr_formidable_tcl_servis_sorgula($fld_kod)!= 200) {
-               $errors['field' . $field->id] = $field->field_options['error_kodkontrol'];               
-            
-            } 
+            $response       = ndr_formidable_tcl_servis_sorgula($kod);
+            $HttpStatusCode = $response["status"];
 
->>>>>>> Stashed changes
+            if ($response["code"] != 0) {
+                if ($HttpStatusCode == 404) {
 
-        if (!ndr_formidable_tcl_servis_sorgula($fld_kod)) {
-            $errors['field' . $field->id] = $field->field_options['error_kodkontrol'];
+                    $errorMesage = "Kod Bulunamadı! Lütfen SMS ile gelen kodu doğru girdiğinizi kontrol ediniz.";
+
+                    } else if ($HttpStatusCode > 499) {
+                    $errorMesage = "Gecici bir sorun oluştu. Daha sonra yeniden deneyiniz.";
+
+                    $subject = 'APRN-TCL-Kampanya servis : ' . $HttpStatusCode;
+                    $body    = $subject . "<hr>";
+                    $body .= '<pre>';
+                    $body .= "<hr>Function : ndr_formidable_tcl_kod_validator ";
+                    $body .= "<hr>SERVER info: " . var_export($_SERVER, true);
+                    $body .= '</pre>';
+                    ndr_send_mail($subject, $body);
+
+                    }
+
+                $errors['field' . $field->id] = $errorMesage;
+                }
+
+
             }
+
         }
-
-
-//var_dump($errors);
 
     return $errors;
     }
@@ -49,68 +63,43 @@ function ndr_formidable_tcl_kod_validator($errors, $field, $value)
 Local Servis validasyon
 */
 
-function ndr_formidable_tcl_servis_sorgula($kod)
+function ndr_formidable_tcl_servis_sorgula($kod = '')
     {
 
-       // echo "function : ndr_formidable_tcl_servis_sorgula";
-    $fld_kod = trim($kod);
-
-    if (ndr_tcl_kod_pre_valid($fld_kod) == false) {
+    $kod      = trim($kod);
+    $response = [];
+    if (ndr_tcl_kod_pre_valid($kod) == false) {
         return false;
         }
+    #Cache kontrolü
+    $cacheData = ndr_cacheGet($kod);
+    if ($cacheData !== false) {
+        $response = $cacheData["data"];
 
-<<<<<<< Updated upstream
-    if ($cacheData = ndr_TclCacheControl($fld_kod)) {
-        $response = json_decode($cacheData, true);
-    
-    } else {
-=======
-
-
-/***************************************** */
-
-$cacheData = ndr_cacheGet($fld_kod);
-
-if ($cacheData !== false) {
-    $response = $cacheData["data"];
-
-}else{
-
-
->>>>>>> Stashed changes
-
-        $fld_kod  = $fld_kod != "" ? $fld_kod : "TestKD";
+        } else {
+        #Local Servis sorgusu 
         $endpoint = get_rest_url(null, 'tcl/v1/kod_kontrol/');
-        $url      = $endpoint . $fld_kod;
+        $url      = $endpoint . $kod;
         $args     = array(
             'timeout'     => 10,
             'httpversion' => '1.1',
         );
+        // $url="http://localhost";
         $request  = wp_remote_get($url, $args);
-
-        if (is_wp_error($request)) {
-            return false;
-            }
         $response = json_decode(wp_remote_retrieve_body($request), true);
 
-        ndr_TclCacheControl($fld_kod, $response);
-    }
-
-<<<<<<< Updated upstream
-    //var_dump($request);
-
-    
-     return $response["status"] == 200 ? true : false;
-
-=======
-      //  var_dump($request);
-        // ndr_TclCacheControl($fld_kod, $response);
-        // }
         ndr_cacheSet($kod, $response);
-    } 
->>>>>>> Stashed changes
+        }
+
+
+    return $response;
+    return $response["data"] === true ? true : $response["status"];
 
 
     }
+
+
+
+
 
 

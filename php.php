@@ -70,7 +70,7 @@ $veri = [
 
 
 $metin = "Content-Type: application/json;charset=utf-8
-Authorization: Basic Ymlsa29tOnNlcnZpc3NvZnQ6YXJzZW5hbDo=
+Authorization: Basic xxxxxxxxxxxxxxxxxxxxx=
 X-header: header değeri";
 
 // Her satırı dizi elemanına dönüştür

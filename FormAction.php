@@ -72,7 +72,7 @@ function register_my_action($actions)
                         </th>
                         <td>
                             <textarea class="large-text" rows="5" cols="50"
-                                placeholder="Authorization: Basic Ymlsa2tnNlZpc3NnQ6YXZW5hbDo=&#10;Content-Type: application/json;charset=utf-8&#10;header_key: header_value&#10;  ..."
+                                placeholder="Authorization: Basic xxxxxxxxxxx=&#10;Content-Type: application/json;charset=utf-8&#10;header_key: header_value&#10;  ..."
                                 name="<?php echo $action_control->get_field_name('service_header') ?>"
                                 id="<?php echo esc_attr($this->get_field_id('service_header')); ?>"><?php echo esc_attr($form_action->post_content['service_header']); ?></textarea>
                             <div>Her bir satıra ayrı hader "key:value" şeklinde giriniz.</div>
@@ -144,7 +144,7 @@ arsenalcampaign_kod_activate($action->post_content);
 function arsenalcampaign_kod_activate($serviceData)
     {
     $serviceObject = [
-        'service_url'    => 'https://api.servissoft.net/v1/bilkom/arsenalcampaign_validate',
+        'service_url'    => 'https://api.xxxxxxxx',
         'service_methot' => 'GET',
         'service_auth'   => '',
         'service_header' => 'Content-Type: application/json;charset=utf-8',

@@ -96,7 +96,7 @@ function service_arsenalcampaign_validate($kod)
 
 
   try {
-    $url = 'https://api.servissoft.net/v1/bilkom/arsenalcampaign_checkCode?code=' . $kod;
+    $url = 'https://xxxxxxxxxxxxxxxxxx?code=' . $kod;
    // $url = 'http://httpstat.us/503';
 
     $curl = curl_init();
@@ -113,7 +113,7 @@ function service_arsenalcampaign_validate($kod)
         CURLOPT_CUSTOMREQUEST  => 'GET',
         // CURLOPT_POSTFIELDS     => $requestBody,
         CURLOPT_HTTPHEADER     => array(
-          'Authorization: Basic Ymlsa29tOnNlcnZpc3NvZnQ6YXJzZW5hbDo=',
+          'Authorization: Basic xxxxxxxxxxxxxxxxxxxxxxxxxxxxx=',
           'Content-Type: application/json'
         ),
       )
